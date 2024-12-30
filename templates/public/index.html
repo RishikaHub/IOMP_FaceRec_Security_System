@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HOME SECURITY SYSTEM</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/owl.carousel.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/templatemo-style.css">
+    <style>
+        #status-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            z-index: 9999;
+        }
+        
+        .status-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .status-error {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .recognition-btn {
+            background: linear-gradient(178.18deg, #0F0C29 -13.56%, #302B63 158.3%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recognition-btn:hover {
+            background: linear-gradient(178.18deg, #302B63 -13.56%, #0F0C29 158.3%);
+        }
+    </style>
+</head>
+<body>
+    <div id="status-message"></div>
+
+    <section class="navbar custom-navbar navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon icon-bar"></span>
+                    <span class="icon icon-bar"></span>
+                    <span class="icon icon-bar"></span>
+                </button>
+                <a href="index.html" class="navbar-brand">HOME <span></span> ALARM </a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-nav-first">
+                    <li><a href="#home" class="smoothScroll">Home</a></li>
+                    <li><a href="#about" class="smoothScroll">About</a></li>
+                    <li><a href="#events" class="smoothScroll">Services</a></li>
+                    <li><a href="#contact" class="smoothScroll">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="home" class="slider" data-stellar-background-ratio="0.5">
+        <div class="row">
+            <div class="owl-carousel owl-theme">
+                <div class="item item-first">
+                    <div class="caption">
+                        <div class="container">
+                            <div class="col-md-8 col-sm-12">
+                                <h3>HOME SECURITY SYSTEM</h3>
+                                <h1>FEEL SAFE IN YOUR HOUSE!<br> "In or out your house with few clicks"</h1>
+                                <a href="#" class="section-btn btn btn-default smoothScroll identify-me">Identify Me</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item item-second">
+                    <div class="caption">
+                        <div class="container">
+                            <div class="col-md-8 col-sm-12">
+                                <h3>HOME SECURITY SYSTEM</h3>
+                                <h1>MANAGE EASILY VIA APP!<br>"We provide Reliable and Affordable services"</h1>
+                                <a href="#" class="section-btn btn btn-default smoothScroll identify-me">Identify Me</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item item-third">
+                    <div class="caption">
+                        <div class="container">
+                            <div class="col-md-8 col-sm-12">
+                                <h3>HOME SECURITY SYSTEM</h3>
+                                <h1>EXPERT AND QUALIFIED STAFF!<br>"Our Professional workers will take care of it"</h1>
+                                <a href="#" class="section-btn btn btn-default smoothScroll identify-me">Identify Me</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="aboutsection">
+        <div class="flexclass">
+            <div class="flexunit">
+                <div class="section-title wow fadeInUp" data-wow-delay="0.2s">
+                    <h3>WHO WE ARE</h3>
+                    <h2 class="heading1">Welcome to HOME ALARM Security System</h2>
+                    <div class="wow fadeInUp" data-wow-delay="0.4s">
+                        <p>Our home alarms help you guard yourself and your family against risks of intrusions, whether you are at home or away.</p>
+                    </div>
+                    <div class="section-title wow fadeInUp" data-wow-delay="0.2s">
+                        <h3>IDENTIFY ME</h3>
+                        <h2 class="heading1">Detect the face for recognition</h2>
+                        <button id="recognize-face" class="recognition-btn">Recognise my face</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function showStatus(message, isSuccess) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = isSuccess ? 'status-success' : 'status-error';
+            statusDiv.style.display = 'block';
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        async function startFaceRecognition(e) {
+          e.preventDefault();
+          try {
+              showStatus('Starting face recognition...', true);
+              const response = await fetch('http://localhost:5050/start_recognition');
+              const data = await response.json();
+              
+              if (data.status === 'success') {
+                  showStatus('Face recognition started successfully', true);
+              } else {
+                  showStatus(data.message, false);
+              }
+          } catch (error) {
+              console.error('Error:', error);
+              showStatus('Error starting face recognition', false);
+          }
+      }
+
+        document.querySelectorAll('.identify-me').forEach(button => {
+            button.addEventListener('click', startFaceRecognition);
+        });
+
+        const recognizeButton = document.getElementById('recognize-face');
+        if (recognizeButton) {
+            recognizeButton.addEventListener('click', startFaceRecognition);
+        }
+    });
+    </script>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.stellar.min.js"></script>
+    <script src="js/wow.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/smoothscroll.js"></script>
+    <script src="js/custom.js"></script>
+</body>
+</html>
