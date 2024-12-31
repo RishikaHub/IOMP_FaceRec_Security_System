@@ -17,9 +17,12 @@
   },
   "homepage": "https://github.com/mehakagg1313/Face-Recognition-Security-System#readme",
   "dependencies": {
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-session": "^1.18.1",
     "mongoose": "^6.3.4",
     "nodemailer": "^6.7.5",
     "nodemailer-mailgun-transport": "^2.1.4"

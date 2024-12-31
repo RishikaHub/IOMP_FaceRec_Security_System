@@ -11,3 +11,4 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://lokig090807:sSSPe1m93
 module.exports.Workshops=require("./workshop")
 module.exports.Hackathons=require("./hackathon")
 module.exports.Colabs=require("./colab")
+module.exports.User = require("./user") 

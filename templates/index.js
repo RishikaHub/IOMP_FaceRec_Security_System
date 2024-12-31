@@ -5,6 +5,9 @@ var eventRoutes = require("./routes/events")
 var errorHandler = require("./handlers/error")
 const port = process.env.PORT || 8080;
 var mailer = require("./handlers/mailHandler")
+const { handleUnknownFaceAlert } = require('./handlers/alertHandler');
+const session = require("express-session")
+const authRoutes = require("./routes/auth")
 require('dotenv').config();
 
 // "bcrypt": "^3.0.8",
@@ -22,6 +25,17 @@ require('dotenv').config();
 app.use('/', express.static('public'))
 app.set('view engine', 'html');
 app.use(bodyParser.json())
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000
+    }
+}))
 
 app.get('/about', (req, res) => {
     res.redirect('/aboutus.html')
@@ -66,6 +80,7 @@ app.get('/events/collaborations', (req, res) => {
 })
 
 app.use("/api/events", eventRoutes)
+app.use("/auth", authRoutes)
 
 app.use((req, res, next) => {
     let err = new Error("NOT FOUND")
@@ -73,6 +88,7 @@ app.use((req, res, next) => {
     next(err)
 })
 
+app.post('/send-alert', handleUnknownFaceAlert);
 
 app.use(errorHandler)
 

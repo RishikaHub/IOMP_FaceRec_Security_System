@@ -4,11 +4,19 @@ from flask_cors import CORS
 from face_Recog import FaceRecognitionSystem
 import threading
 import cv2
+import os
 
 app = Flask(__name__, static_folder='templates/public')
 CORS(app)
 
-face_system = FaceRecognitionSystem()
+# Initialize face recognition system
+face_system = FaceRecognitionSystem(
+    dataset_path="dataset_family/",
+    sender_email="gaddamlokesh20@gmail.com",
+    recipient_email="rishikabussa31@gmail.com",
+    email_password="fewb zzgt kufv bpep"
+)
+
 recognition_thread = None
 is_recognition_running = False
 
@@ -19,6 +27,13 @@ def index():
 @app.route('/start_recognition')
 def start_recognition():
     global recognition_thread, is_recognition_running
+    
+    # Check if email password is configured
+    if not face_system.email_password:
+        return jsonify({
+            "status": "error", 
+            "message": "Email password not configured in face recognition system."
+        })
     
     # If recognition is already running, stop it first
     if is_recognition_running:

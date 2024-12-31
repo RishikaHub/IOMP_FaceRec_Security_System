@@ -1,18 +1,74 @@
-# face_Recog.py
 import cv2
 import face_recognition
 import os
 import time
 from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 class FaceRecognitionSystem:
-    def __init__(self, dataset_path="dataset_family/"):
+    def __init__(self, dataset_path="dataset_family/", 
+                 sender_email=None,
+                 recipient_email=None,
+                 email_password=None):
         self.known_face_encodings = []
         self.known_face_names = []
         self.dataset_path = dataset_path
         self.is_running = False
-        self.load_known_faces()
         
+        # Email configuration
+        self.sender_email = sender_email
+        self.recipient_email = recipient_email
+        self.email_password = email_password
+        self.smtp_server = "smtp.gmail.com"
+        self.smtp_port = 587
+        
+        self.load_known_faces()
+
+    def send_unknown_face_email(self, image_path):
+        """Send email with unknown face image as attachment"""
+        if not all([self.sender_email, self.email_password, self.recipient_email]):
+            print("Email configuration is incomplete. Skipping email notification.")
+            return
+
+        try:
+            # Create the email message
+            msg = MIMEMultipart()
+            msg['Subject'] = 'Unknown Face Detected - Security Alert'
+            msg['From'] = self.sender_email
+            msg['To'] = self.recipient_email
+
+            # Add text body
+            text_body = f"""
+            Security Alert: Unknown face detected at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            
+            Please review the attached image for more information.
+            """
+            msg.attach(MIMEText(text_body, 'plain'))
+
+            # Add the image attachment
+            with open(image_path, 'rb') as f:
+                img_data = f.read()
+            image = MIMEImage(img_data, name=os.path.basename(image_path))
+            msg.attach(image)
+
+            # Connect to SMTP server and send email
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.starttls()
+                server.login(self.sender_email, self.email_password)
+                server.send_message(msg)
+
+            print("Alert email sent successfully")
+            
+            # Clean up the temporary image file
+            os.remove(image_path)
+            
+        except Exception as e:
+            print(f"Error sending email: {str(e)}")
+
+    # ... [rest of the methods remain the same as in your original file] ...
     def load_known_faces(self):
         """Load and encode all known faces from the dataset directory"""
         self.known_face_encodings = []
@@ -37,7 +93,6 @@ class FaceRecognitionSystem:
 
     def run_recognition(self):
         """Run the face recognition system"""
-        # If already running, destroy existing windows first
         if self.is_running:
             cv2.destroyAllWindows()
             
@@ -48,7 +103,6 @@ class FaceRecognitionSystem:
             print("Error: Could not open video capture device")
             return
 
-        # Set window properties
         cv2.namedWindow('Face Recognition', cv2.WINDOW_NORMAL)
         cv2.setWindowProperty('Face Recognition', cv2.WND_PROP_TOPMOST, 1)
         
@@ -59,9 +113,6 @@ class FaceRecognitionSystem:
             ret, frame = video_capture.read()
             if not ret:
                 break
-
-            # Bring window to front periodically
-            cv2.setWindowProperty('Face Recognition', cv2.WND_PROP_TOPMOST, 1)
 
             small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
             rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
@@ -88,10 +139,10 @@ class FaceRecognitionSystem:
                 current_time = time.time()
                 if "Unknown" in face_names and (current_time - last_save_time) >= 30:
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    cv2.imwrite(f"unknown_face_{timestamp}.jpg", frame)
+                    image_path = f"unknown_face_{timestamp}.jpg"
+                    cv2.imwrite(image_path, frame)
+                    self.send_unknown_face_email(image_path)
                     last_save_time = current_time
-                    if os.path.exists("mailme.sh"):
-                        os.system('sh mailme.sh')
 
             process_this_frame = not process_this_frame
 
@@ -107,14 +158,11 @@ class FaceRecognitionSystem:
                 cv2.putText(frame, name, (left + 6, bottom - 6), 
                            cv2.FONT_HERSHEY_DUPLEX, 0.6, (255, 255, 255), 1)
 
-            # Display the resulting frame
             cv2.imshow('Face Recognition', frame)
 
-            # Quit if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        # Clean up
         video_capture.release()
         cv2.destroyAllWindows()
         self.is_running = False
