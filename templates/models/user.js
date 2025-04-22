@@ -14,6 +14,17 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    files: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'files.files' // Reference to GridFS files collection
+    }],
+    lastLogin: {
+        type: Date
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -37,6 +48,12 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     } catch (err) {
         throw err;
     }
+};
+
+userSchema.methods.toJSON = function() {
+    const obj = this.toObject();
+    delete obj.password;
+    return obj;
 };
 
 module.exports = mongoose.model('User', userSchema);

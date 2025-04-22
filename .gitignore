@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Specific files to ignore
+dataset_family/Lokesh.jpg
+
 # C extensions
 *.so
 
