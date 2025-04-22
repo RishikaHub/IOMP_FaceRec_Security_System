@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 class FaceRecognitionSystem:
     def __init__(self, dataset_path="dataset_family/", 
-                 sender_email=None,
+                 sender_email="miniprojectiomp@gmail.com",
                  recipient_email=None,
-                 email_password=None):
+                 email_password="dsoo yefa dtur dgwg"):
         self.known_face_encodings = []
         self.known_face_names = []
         self.dataset_path = dataset_path

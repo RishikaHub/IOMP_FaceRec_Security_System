@@ -66,9 +66,10 @@ body {
 }
 
 .header-logo {
-    max-width: 120px;
-    margin-bottom: 15px;
-}
+    max-width: 100%;
+    height: auto;
+  }
+  
 
 .header-title {
     font-size: 28px;
