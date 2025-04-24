@@ -331,7 +331,7 @@
                             <button class="action-btn" onclick="downloadFile('${file._id}', '${file.originalName}')" title="Download">
                                 <span class="material-icons">download</span>
                             </button>
-                            <button class="action-btn delete" onclick="deleteFile('${file._id}')" title="Delete">
+                            <button class="action-btn delete" onclick="deleteFile('${file.originalName}')" title="Delete">
                                 <span class="material-icons">delete</span>
                             </button>
                         </div>
@@ -380,22 +380,28 @@
             }
         }
 
-        async function deleteFile(fileId) {
+        async function deleteFile(fileName) {
             if (!confirm('Are you sure you want to delete this file?')) return;
             
             try {
-                const response = await fetch(`/api/files/${fileId}`, {
+                // Changed endpoint to properly pass the filename for lookup by originalName
+                const response = await fetch(`/api/files/delete/${fileName}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
+        
                 if (response.status === 401) {
                     handleAuthError();
                     return;
                 }
 
+                if (response.status === 404) {
+                    alert('File not found');
+                    return;
+                }
+        
                 if (response.ok) {
                     loadFiles();
                 } else {

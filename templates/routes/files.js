@@ -75,20 +75,37 @@ router.get('/download/:filename', loginRequired, async (req, res) => {
     }
 });
 
-router.delete('/:fileId', loginRequired, async (req, res) => {
+// Assuming this is in your routes/files.js or similar
+router.delete('/delete/:fileName', loginRequired, async (req, res) => {
     try {
+        const fileName = req.params.fileName;
+        
+        // Find the file using originalName from the metadata
         const file = await bucket.find({
-            _id: new mongoose.Types.ObjectId(req.params.fileId),
-            'metadata.userId': req.user._id
+            'metadata.originalName': fileName
         }).next();
-        if (!file) return res.status(404).json({ message: 'File not found' });
+
+        if (!file) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+
+        // Verify file ownership
+        if (file.metadata.userId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        // Delete using the file's _id
         await bucket.delete(file._id);
+        
+        // Update user record if needed
         await mongoose.model('User').findByIdAndUpdate(
             req.user._id,
             { $pull: { files: file._id } }
         );
+        
         res.json({ message: 'File deleted successfully' });
     } catch (err) {
+        console.error('Delete error:', err);
         res.status(500).json({ message: 'Error deleting file' });
     }
 });

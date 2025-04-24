@@ -13,7 +13,6 @@ const port = process.env.PORT || 8080;
 // Initialize MongoDB connection via models/index.js
 require('./models');
 
-app.use('/', express.static('public'));
 app.set('view engine', 'html');
 
 // Configure middleware
@@ -34,17 +33,29 @@ app.use(session({
     }
 }));
 
-// API Routes
-app.use("/api/events", eventRoutes);
+// API Routes first
 app.use("/auth", authRoutes);
+app.use("/api/events", eventRoutes);
 app.use("/api/files", fileRoutes);
 
+// Static files after API routes
+app.use(express.static('public'));
 
-// Error handling
+// 404 handler
 app.use((req, res, next) => {
-    let err = new Error("NOT FOUND");
+    const err = new Error("NOT FOUND");
     err.status = 404;
     next(err);
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    const status = err.status || 500;
+    res.status(status).json({
+        status: "error",
+        message: err.message || "An unexpected error occurred"
+    });
 });
 
 app.listen(port, () => {

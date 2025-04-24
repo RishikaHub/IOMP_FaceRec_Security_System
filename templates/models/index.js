@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 mongoose.set("debug", true);
 mongoose.Promise = Promise;
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://lokig090807:sSSPe1m93Tzb0bk4@facerecog.hal6m.mongodb.net/";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://rishikadb:rishikadb@sharespend.h1m7b6r.mongodb.net/fileauth";
 
 mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
