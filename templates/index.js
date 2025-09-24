@@ -15,10 +15,10 @@ require('./models');
 
 app.set('view engine', 'html');
 
-// Configure middleware
+// Middleware
 app.use(bodyParser.json());
 app.use(cors({
-    origin: ['http://localhost:5050', 'http://localhost:8080'],
+    origin: ['http://localhost:5050', 'http://127.0.0.1:5050'],
     credentials: true
 }));
 
@@ -33,12 +33,12 @@ app.use(session({
     }
 }));
 
-// API Routes first
+// Routes
 app.use("/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/files", fileRoutes);
 
-// Static files after API routes
+// Static files
 app.use(express.static('public'));
 
 // 404 handler
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
     next(err);
 });
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
     const status = err.status || 500;
@@ -59,5 +59,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+    console.log(`Server started on http://localhost:${port}`);
 });

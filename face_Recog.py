@@ -306,7 +306,7 @@ class FaceRecognitionSystem:
             logger.info(f"Screen confidence: {screen_confidence:.2f}%")
             
             # Use strict floating point comparison for 60% threshold
-            if float(screen_confidence) >= 60.0 or abs(float(screen_confidence) - 60.0) < 0.0001:
+            if float(screen_confidence) >= 61.0 or abs(float(screen_confidence) - 61.0) < 0.0001:
                 logger.warning(f"Screen detected with {screen_confidence:.2f}% confidence - Access Denied")
                 return None, f"Access denied - Screen display detected ({screen_confidence:.1f}% confidence)"
 
@@ -391,7 +391,7 @@ class FaceRecognitionSystem:
                 if face_encodings:
                     is_screen, screen_conf = self.check_for_screen(frame)
                     # Use strict floating point comparison for 60% threshold
-                    if float(screen_conf) >= 60.0 or abs(float(screen_conf) - 60.0) < 0.0001:
+                    if float(screen_conf) >= 61.0 or abs(float(screen_conf) - 61.0) < 0.0001:
                         face_names = ["Screen Detected"] * len(face_encodings)
                         face_confidences = [screen_conf] * len(face_encodings)
                         continue
